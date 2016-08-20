@@ -241,6 +241,8 @@ public class CameraSettings {
     public static final String KEY_QC_SUPPORTED_MANUAL_EXPOSURE_MODES = "manual-exposure-modes";
     public static final String KEY_QC_SUPPORTED_MANUAL_WB_MODES = "manual-wb-modes";
 
+    public static final String KEY_REQUEST_PERMISSION  = "request_permission";
+
     public static final String KEY_SELFIE_FLASH = "pref_selfie_flash_key";
 
     public static final String EXPOSURE_DEFAULT_VALUE = "0";
@@ -900,6 +902,7 @@ public class CameraSettings {
         ListPreference videoHfrMode =
                 group.findPreference(KEY_VIDEO_HIGH_FRAME_RATE);
         ListPreference seeMoreMode = group.findPreference(KEY_SEE_MORE);
+        ListPreference savePath = group.findPreference(KEY_CAMERA_SAVEPATH);
 
         // Since the screen could be loaded from different resources, we need
         // to check if the preference is available here
@@ -1013,7 +1016,7 @@ public class CameraSettings {
             final String CAMERA_SAVEPATH_SDCARD = "1";
             final int CAMERA_SAVEPATH_SDCARD_IDX = 1;
             final int CAMERA_SAVEPATH_PHONE_IDX = 0;
-            ListPreference savePath = group.findPreference(KEY_CAMERA_SAVEPATH);
+
             SharedPreferences pref = group.getSharedPreferences();
             String savePathValue = null;
             if (pref != null) {
@@ -1029,7 +1032,13 @@ public class CameraSettings {
                     Log.d(TAG, "set Phone as save path when sdCard is unavailable.");
                     savePath.setValueIndex(CAMERA_SAVEPATH_PHONE_IDX);
                 }
-           }
+            }
+        }
+        if (savePath != null) {
+            Log.d(TAG, "check storage menu " +  SDCard.instance().isWriteable());
+            if (!SDCard.instance().isWriteable()) {
+                removePreference(group, savePath.getKey());
+            }
         }
 
         qcomInitPreferences(group);
